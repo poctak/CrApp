@@ -3,7 +3,7 @@ import websockets
 import json
 import time
 
-socket = "wss://stream.binance.com:9443/ws/btcusdt@depth"
+socket = "wss://stream.binance.com:9443/ws/pepeeur@depth"
 
 # Ukládáme order book do proměnné
 order_book_state = {
