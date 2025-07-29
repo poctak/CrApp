@@ -14,8 +14,8 @@ order_book_state = {
 
 # Formátované vypsání top 5 úrovní
 def print_order_book():
-    bids = order_book_state["bids"][:5]
-    asks = order_book_state["asks"][:5]
+    bids = order_book_state["bids"][:50]
+    asks = order_book_state["asks"][:50]
 
     print("\n📘 ORDER BOOK – BTC/USDT")
     print(f"{'ASK (Cena)':>12} {'Množství':>10}     {'BID (Cena)':>12} {'Množství':>10}")
