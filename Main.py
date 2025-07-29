@@ -1,24 +1,25 @@
-import requests
-import time
-import hmac
-import hashlib
+import asyncio
+import websockets
+import json
 
-API_KEY = 'TVŮJ_API_KEY'
-SECRET_KEY = 'TVŮJ_SECRET_KEY'
+# WebSocket URL pro order book (hloubku trhu) BTC/USDT
+socket = "wss://stream.binance.com:9443/ws/btcusdt@depth"
 
-base_url = 'https://api.binance.com'
 
-def get_account_info():
-    endpoint = '/api/v3/account'
-    timestamp = int(time.time() * 1000)
-    query_string = f'timestamp={timestamp}'
-    signature = hmac.new(SECRET_KEY.encode(), query_string.encode(), hashlib.sha256).hexdigest()
+async def order_book():
+    async with websockets.connect(socket) as websocket:
+        print("Připojeno k Binance order book streamu.")
+        while True:
+            msg = await websocket.recv()
+            data = json.loads(msg)
 
-    headers = {'X-MBX-APIKEY': API_KEY}
-    url = f'{base_url}{endpoint}?{query_string}&signature={signature}'
+            bids = data.get("b", [])  # nákupní příkazy
+            asks = data.get("a", [])  # prodejní příkazy
 
-    response = requests.get(url, headers=headers)
-    return response.json()
+            print("🔵 Nejvyšší BID:", bids[0] if bids else "Žádné")
+            print("🔴 Nejnižší ASK:", asks[0] if asks else "Žádné")
+            print("-" * 30)
 
-# Příklad použití
-print(get_account_info())
+
+# Spustit asynchronní smyčku
+asyncio.get_event_loop().run_until_complete(order_book())
