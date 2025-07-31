@@ -2,7 +2,7 @@ import asyncio
 import websockets
 import json
 
-socket = "wss://stream.binance.com:9443/ws/btcusdt@trade"
+socket = "wss://stream.binance.com:9443/ws/pepeeur@trade"
 
 async def print_trades():
     async with websockets.connect(socket) as websocket:
