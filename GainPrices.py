@@ -1,23 +1,24 @@
 import asyncio
-import requests
+import websockets
+import json
+import logging
 
-async def fetch_last_trade_loop():
-    url = "https://api.binance.com/api/v3/trades?symbol=BTCUSDC&limit=1"
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 
-    while True:
-        try:
-            response = requests.get(url)
-            data = response.json()
-            if data:
-                last_trade = data[0]
-                price = float(last_trade['price'])
-                qty = float(last_trade['qty'])
-                print(f"💰 Poslední cena: {price:,.2f} USDC | 📊 Objem: {qty}")
-            else:
-                print("⚠️ Žádná data")
-        except Exception as e:
-            print(f"❌ Chyba: {e}")
+async def stream_price():
+    url = "wss://stream.binance.com:9443/ws/btcusdc@trade"
+    logging.info("📡 Připojuji se ke streamu BTC/USDC...")
+    try:
+        async with websockets.connect(url) as websocket:
+            while True:
+                msg = await websocket.recv()
+                data = json.loads(msg)
+                price = data['p']
+                quantity = data['q']
+                logging.info(f"💰 Cena: {price} | 📊 Objem: {quantity}")
+                await asyncio.sleep(10)
+    except Exception as e:
+        logging.error(f"❌ Chyba při připojení: {e}")
 
-        await asyncio.sleep(5)
-
-asyncio.run(fetch_last_trade_loop())
+if __name__ == "__main__":
+    asyncio.run(stream_price())
