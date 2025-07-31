@@ -1,9 +1,8 @@
-name: Build and Push Docker Image
+name: Build and Push Docker image
 
 on:
   push:
-    branches:
-      - main   # nebo název tvé hlavní větve
+    branches: [ main ]  # spusť po každém pushi na main
 
 jobs:
   build-and-push:
@@ -11,17 +10,20 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: tvoje-uzivatelske-jmeno/crapp:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/crapp:latest
