@@ -14,7 +14,7 @@ logging.basicConfig(
 
 
 # Elasticsearch client
-es = Elasticsearch("http://localhost:9200")  # uprav pokud máš jinou adresu
+es = Elasticsearch("http://host.docker.internal:9200")  # uprav pokud máš jinou adresu
 INDEX_NAME = "my-crypto-index"
 async def fetch_last_trade_loop():
 
