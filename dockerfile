@@ -10,7 +10,7 @@ COPY GainPrices.py .
 # Instalace požadovaných knihoven
 RUN pip install --no-cache-dir \
     elasticsearch==8.19.0 \
-    aiohttp
+    requests
 
 # Spuštění skriptu při startu kontejneru
 CMD ["python", "GainPrices.py"]
