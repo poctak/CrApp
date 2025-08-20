@@ -49,7 +49,7 @@ async def fetch_last_trade_loop():
             else:
                 logging.warning("⚠️ Žádná data")
         except Exception as e:
-            logging.error(f"❌ Chyba: {e}")
+            logging.error(f"❌Chyba: {e}")
 
         await asyncio.sleep(5)
 
