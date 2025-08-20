@@ -7,8 +7,10 @@ WORKDIR /app
 # Zkopíruj requirements (pokud máš) a GainPrices.py do kontejneru
 COPY GainPrices.py .
 
-# Instaluj závislosti (tady jen requests)
-RUN pip install --no-cache-dir requests elasticsearch aiohttp
+# Instalace požadovaných knihoven
+RUN pip install --no-cache-dir \
+    elasticsearch==8.19.0 \
+    aiohttp
 
 # Spuštění skriptu při startu kontejneru
 CMD ["python", "GainPrices.py"]
