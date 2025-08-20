@@ -8,7 +8,7 @@ WORKDIR /app
 COPY GainPrices.py .
 
 # Instaluj závislosti (tady jen requests)
-RUN pip install --no-cache-dir requests
+RUN pip install --no-cache-dir requests elasticsearch aiohttp
 
 # Spuštění skriptu při startu kontejneru
 CMD ["python", "GainPrices.py"]
