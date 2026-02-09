@@ -1,62 +1,57 @@
 import asyncio
-import requests
+import json
 import logging
+import websockets
 from datetime import datetime, timezone
-from elasticsearch import Elasticsearch
 
-pairs = ["BTCUSDC", "ETHUSDC", "PEPEUSDC"]
+BINANCE_WS = "wss://stream.binance.com:9443/stream?streams=!ticker@arr"
 
-# Nastavení logování
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
 
 
-# Elasticsearch client
-es = Elasticsearch("http://host.docker.internal:9200")  # uprav pokud máš jinou adresu
-INDEX_NAME = "my-crypto-index"
-async def fetch_last_trade_loop():
+async def listen_binance():
+    async with websockets.connect(
+        BINANCE_WS,
+        ping_interval=20,
+        ping_timeout=20
+    ) as ws:
+        logging.info("🚀 Připojeno k Binance WebSocket")
+
+        async for message in ws:
+            data = json.loads(message)
+
+            # pole všech tickerů
+            tickers = data["data"]
+
+            timestamp = datetime.now(timezone.utc).isoformat()
+
+            for t in tickers:
+                symbol = t["s"]
+
+                # pouze USDT páry
+                if not symbol.endswith("USDT"):
+                    continue
+
+                price = float(t["c"])   # last price
+                volume = float(t["v"])  # base volume
+
+                logging.info(
+                    f"{timestamp} | {symbol:<12} | 💰 {price:,.6f} | 📊 {volume:,.2f}"
+                )
 
 
+async def main():
     while True:
-        for pair in pairs:
-            url = "https://api.binance.com/api/v3/trades?symbol=" + pair + "&limit=1"
-            try:
-                response = requests.get(url)
-                response.raise_for_status()  # ošetří chyby HTTP
-                data = response.json()
-                if data:
-                    last_trade = data[0]
-                    price = float(last_trade['price'])
-                    qty = float(last_trade['qty'])
-                    timestamp = datetime.now(timezone.utc).isoformat()
+        try:
+            await listen_binance()
+        except Exception as e:
+            logging.error(f"❌ WebSocket chyba: {e}")
+            logging.info("🔄 Reconnect za 5s...")
+            await asyncio.sleep(5)
 
-                    # Vložení do Elasticsearch
-                    doc_price = {
-                        "pair": pair,
-                        "timestamp": timestamp,
-                        "title": "price",
-                        "value": price
-                    }
-                    doc_qty = {
-                        "pair": pair,
-                        "timestamp": timestamp,
-                        "title": "quantity",
-                        "value": qty
-                    }
-
-                    es.index(index=INDEX_NAME, document=doc_price)
-                    es.index(index=INDEX_NAME, document=doc_qty)
-
-                    logging.info(f"💰 Poslední cena: {price:,.2f} USDC | 📊 Objem: {qty}")
-                else:
-                    logging.warning("⚠️ Žádná data")
-            except Exception as e:
-                logging.error(f"❌ Chyba: {e}" )
-
-            await asyncio.sleep(2)
 
 if __name__ == "__main__":
-    logging.info("🚀 Spouštím sledování...")
-    asyncio.run(fetch_last_trade_loop())
+    asyncio.run(main())
