@@ -1,13 +1,15 @@
-# Oficiální Python image
+# Použij oficiální Python 3.11 slim
 FROM python:3.11-slim
 
+# Nastav pracovní adresář
 WORKDIR /app
 
-# Kopíruj jen skript
+# Zkopíruj requirements a nainstaluj knihovny
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Zkopíruj skript do kontejneru
 COPY GainPrices.py .
 
-# Nainstaluj jen to, co skutečně používáš
-RUN pip install --no-cache-dir websockets
-
-# Spusť aplikaci
+# Spusť aplikaci při startu kontejneru
 CMD ["python", "GainPrices.py"]
