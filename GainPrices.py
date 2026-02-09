@@ -23,7 +23,7 @@ MAX_TICKS = 360
 history = defaultdict(lambda: deque(maxlen=MAX_TICKS))
 
 # Spike threshold v procentech
-SPIKE_THRESHOLD = 2.0  # 5% nárůst proti průměru
+SPIKE_THRESHOLD = 7.0  # 5% nárůst proti průměru
 
 # Funkce pro kontrolu anomálie
 def check_anomaly(symbol, price):
