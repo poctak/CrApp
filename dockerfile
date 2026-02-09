@@ -1,16 +1,13 @@
-# Použij oficiální Python 3.11 image jako základ
+# Oficiální Python image
 FROM python:3.11-slim
 
-# Nastav pracovní adresář v kontejneru
 WORKDIR /app
 
-# Zkopíruj requirements (pokud máš) a GainPrices.py do kontejneru
+# Kopíruj jen skript
 COPY GainPrices.py .
 
-# Instalace požadovaných knihoven
-RUN pip install --no-cache-dir \
-    elasticsearch==8.19.0 \
-    requests
+# Nainstaluj jen to, co skutečně používáš
+RUN pip install --no-cache-dir websockets
 
-# Spuštění skriptu při startu kontejneru
+# Spusť aplikaci
 CMD ["python", "GainPrices.py"]
