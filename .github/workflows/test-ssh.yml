@@ -1,0 +1,29 @@
+name: Test SSH to Server
+
+on:
+  push:
+    branches: [ main ]  # nebo tvá větev
+
+jobs:
+  test-ssh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY_SERVER" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
+        env:
+          SSH_KEY_SERVER: ${{ secrets.SSH_KEY_SERVER }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+
+      - name: Test SSH Connection
+        run: ssh -i ~/.ssh/id_ed25519 root@$SERVER_IP "echo 'SSH works!'"
+        env:
+          SSH_KEY_SERVER: ${{ secrets.SSH_KEY_SERVER }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
