@@ -1,16 +1,18 @@
 name: Test SSH to Server
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # umožní ruční spuštění z GitHub UI
 
 jobs:
   test-ssh:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repo (potřebné pro workflow)
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      # 2️⃣ Nastavení SSH
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -21,6 +23,7 @@ jobs:
           SSH_KEY_SERVER: ${{ secrets.SSH_KEY_SERVER }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
 
+      # 3️⃣ Test připojení k serveru
       - name: Test SSH Connection
         run: ssh -i ~/.ssh/id_ed25519 root@$SERVER_IP "echo 'SSH works!'"
         env:
