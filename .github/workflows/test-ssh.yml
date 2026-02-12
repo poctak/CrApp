@@ -1,8 +1,7 @@
 name: Test SSH to Server
 
 on:
-  push:
-    branches: [ main ]  # nebo tvá větev
+  workflow_dispatch:
 
 jobs:
   test-ssh:
